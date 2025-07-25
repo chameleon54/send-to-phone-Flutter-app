@@ -1,6 +1,7 @@
 # send_to_phone_app
 
-A new Flutter project.
+Flutter project that suppose to connect to send to phone app https://github.com/chameleon54/send-to-phone
+BOTH are in development
 
 ## Getting Started
 
