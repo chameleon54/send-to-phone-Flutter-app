@@ -1,37 +1,22 @@
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class BackendService {
-  static const String baseUrl = "http://<YOUR-PC-IP>:5000";
+  static Future<String?> getBaseUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ip = prefs.getString('server_ip');
+    return ip != null ? "http://$ip" : null;
+  }
 
-  // Get clipboard text from PC
   static Future<String?> getClipboard() async {
-    try {
-      final response = await http.get(Uri.parse("$baseUrl/clipboard"));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data["clipboard"];
-      } else {
-        print("Failed to get clipboard: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error: $e");
+    final baseUrl = await getBaseUrl();
+    if (baseUrl == null) return null;
+    final response = await http.get(Uri.parse("$baseUrl/clipboard"));
+    if (response.statusCode == 200) {
+      return response.body;
     }
     return null;
   }
 
-  // Send clipboard text to PC
-  static Future<bool> sendClipboard(String text) async {
-    try {
-      final response = await http.post(
-        Uri.parse("$baseUrl/clipboard"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"text": text}),
-      );
-      return response.statusCode == 200;
-    } catch (e) {
-      print("Error: $e");
-      return false;
-    }
-  }
+  // Add more API methods like uploadFile, sendClipboard, etc.
 }
